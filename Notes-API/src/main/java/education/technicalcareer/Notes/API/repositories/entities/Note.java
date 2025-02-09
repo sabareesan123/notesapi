@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
+import java.time.LocalDate;
+
 @Entity
 @Getter
 @Setter
@@ -16,11 +19,17 @@ public class Note {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
     @Column(nullable = false)
     private String title;
 
     @Column(columnDefinition = "TEXT")
-    private String content;
+    private String body;
 
-    // No need for explicit constructors or getters/setters anymore!
+    @Column
+    private LocalDate createdDate = LocalDate.now(); // Default to current date
+
+    @Enumerated(EnumType.STRING)  // Store enum as a string in DB
+    @Column(nullable = false)
+    private Color color;
 }

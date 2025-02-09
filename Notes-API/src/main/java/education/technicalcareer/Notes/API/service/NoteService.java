@@ -2,11 +2,11 @@ package education.technicalcareer.Notes.API.service;
 
 // ... (imports)
 
-import education.technicalcareer.Notes.API.controllers.dtos.NoteDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import education.technicalcareer.Notes.API.repositories.entities.Note;
 import education.technicalcareer.Notes.API.repositories.NoteRepository;
+import education.technicalcareer.Notes.API.controllers.dtos.NoteDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,15 +20,15 @@ public class NoteService {
     // ... (other methods)
 
     //Helper Methods for DTO and Entity Conversion (Simplified)
-    private NoteDto convertToDto(Note note) {
-        return new NoteDto(note.getId(),note.getTitle(), note.getContent()); // Using AllArgsConstructor
+    private NoteDTO convertToDto(Note note) {
+        return new NoteDTO(note.getId(),note.getTitle(), note.getBody(),note.getCreatedDate(), note.getColor()); // Using AllArgsConstructor
     }
 
-    private Note convertToEntity(NoteDto noteDto) {
-        return new Note(null, noteDto.getTitle(), noteDto.getContent()); // Using AllArgsConstructor, setting id to null for new entities
+    private Note convertToEntity(NoteDTO noteDto) {
+        return new Note(null, noteDto.getTitle(), noteDto.getBody(),noteDto.getCreatedDate(),noteDto.getColor()); // Using AllArgsConstructor, setting id to null for new entities
     }
 
-    public Optional<NoteDto> getNoteById(Long id) {
+    public Optional<NoteDTO> getNoteById(Long id) {
 
         if( noteRepository.findById(id).isPresent() )
             return Optional.of(convertToDto(noteRepository.findById(id).get()));
@@ -37,7 +37,7 @@ public class NoteService {
 
     }
 
-    public List<NoteDto> getAllNotes() {
+    public List<NoteDTO> getAllNotes() {
         return noteRepository.findAll().stream().map(this::convertToDto).toList();
 
     }
@@ -49,17 +49,20 @@ public class NoteService {
             throw  new RuntimeException("Note not found. Please try with correct note id ");
     }
 
-    public NoteDto createNote(NoteDto noteDto) {
+    public NoteDTO createNote(NoteDTO noteDto) {
         return convertToDto( noteRepository.save(convertToEntity(noteDto)));
 
     }
 
-    public NoteDto updateNote(Long id, NoteDto noteDto) {
+    public NoteDTO updateNote(Long id, NoteDTO noteDto) {
         var noteEntityOptional = noteRepository.findById(id);
         if( noteEntityOptional.isPresent()) {
             var entity = noteEntityOptional.get();
-            entity.setContent(noteDto.getContent());
+            entity.setId(noteDto.getId());
             entity.setTitle(noteDto.getTitle());
+            entity.setBody(noteDto.getBody());
+            entity.setCreatedDate(noteDto.getCreatedDate());
+            entity.setColor(noteDto.getColor());
             return convertToDto(noteRepository.save(entity));
         }
 
